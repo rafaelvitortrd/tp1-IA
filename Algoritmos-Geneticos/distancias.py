@@ -1,7 +1,7 @@
+import os
 import numpy as np
 from deap import base, creator, tools, algorithms
 import random
-import numpy as np
 import plotly.graph_objects as go
 
 
@@ -24,7 +24,8 @@ def avaliacao(individuo):
     return (distancia_total,)
 
 # Leitura do arquivo de entrada dos pontos
-with open("instancia.txt", "r") as f:
+_dir = os.path.dirname(os.path.abspath(__file__))
+with open(os.path.join(_dir, "instancia.txt"), "r") as f:
     quantidade = int(f.readline())
     pontos = np.loadtxt(f)
 
