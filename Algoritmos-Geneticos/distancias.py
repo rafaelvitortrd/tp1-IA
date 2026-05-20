@@ -136,17 +136,67 @@ stats.register("min", np.min)
 stats.register("avg", np.mean)
 stats.register("max", np.max)
 
-# Excutando o algoritmo genetico
-pop, logbook = algorithms.eaSimple(
-    pop,
-    toolbox,
-    cxpb=0.7,
-    mutpb=0.2,
-    ngen=100,
-    stats=stats,
-    halloffame=hof,
-    verbose=True
-)
+# Excutando o algoritmo genetico com parada antecipada
+# Cria um objeto do DEAP usado para armazenar o histórico das gerações
+logbook = tools.Logbook()
+
+# Inicializa o melhor fitness com um numero "infinito"
+melhor_fitness = float("inf")
+geracoes_sem_melhora = 0
+
+# numero maximo de gerações
+ngen = 100
+
+# Executa as gerações
+for gen in range(ngen):
+
+    # Cria a nova geração aplicando cossover e mutação nos individuos da população
+    offspring = algorithms.varAnd(
+        pop,
+        toolbox,
+        cxpb=0.7,
+        mutpb=0.2
+    )
+
+    # Recalcular o fitness dos individuos que sofreram mutação e crossover
+    invalidos = [ind for ind in offspring if not ind.fitness.valid]
+    fitnesesInv = map(toolbox.evaluate, invalidos)
+
+    # Atualiza o fitness dos individuos que sofreram mutação e crossover (Invalidos)
+    for ind, fit in zip(invalidos, fitnesesInv):
+        ind.fitness.values = fit
+
+    # Faz a seleção dos individuos (Torneio)
+    pop = toolbox.select(offspring, k=len(pop))
+
+    # Atualiza o melhor individuo encontrado até agora
+    hof.update(pop)
+
+    # Calcula, salva e mostra as estatisticas da geração e armazena
+    record = stats.compile(pop)
+    logbook.record(gen=gen, **record)
+    print(logbook.stream)
+
+    # melhor valor atual
+    fitness_atual = hof[0].fitness.values[0]
+
+    # Logica para a condição de parada
+    # Se não houver melhor do fitness por 20 gerações
+    if fitness_atual < melhor_fitness:
+
+        melhor_fitness = fitness_atual
+
+        geracoes_sem_melhora = 0
+
+    else:
+
+        geracoes_sem_melhora += 1
+
+    if geracoes_sem_melhora >= 20:
+
+        print("Parada antecipada!")
+
+        break
 
 geracoes = logbook.select("gen")
 melhores = logbook.select("min")
