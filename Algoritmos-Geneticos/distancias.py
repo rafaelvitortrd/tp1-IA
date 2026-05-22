@@ -136,7 +136,7 @@ stats.register("min", np.min)
 stats.register("avg", np.mean)
 stats.register("max", np.max)
 
-# Excutando o algoritmo genetico com parada antecipada
+# Excutando o algoritmo genetico com parada antecipada para 20 gerações sem melhora
 # Cria um objeto do DEAP usado para armazenar o histórico das gerações
 logbook = tools.Logbook()
 
