@@ -2,6 +2,7 @@
 
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 
 def ler_dados_txt(nome_arquivo):
     diretorio_do_script = os.path.dirname(os.path.abspath(__file__))
@@ -122,6 +123,43 @@ if __name__ == "__main__":
         print("\n--- Resultado Final ---")
         print(f"Melhor ordem: {' -> '.join(map(str, caminho_otimo))} -> {caminho_otimo[0]}")
         print(f"Menor distância: {dist_otima:.4f}")
+
+        x = coordenadas[:, 0]
+        y = coordenadas[:, 1]
+
+        plt.figure(figsize=(8, 6))
+
+        for i in range(len(caminho_otimo)):
+            cidade_atual = caminho_otimo[i]
+            proxima_cidade = caminho_otimo[(i + 1) % len(caminho_otimo)]
+
+            plt.plot(
+                [x[cidade_atual], x[proxima_cidade]],
+                [y[cidade_atual], y[proxima_cidade]]
+            )
+
+        plt.scatter(x, y)
+
+        for i in range(len(coordenadas)):
+            plt.annotate(
+                str(i),
+                (x[i], y[i]),
+                xytext=(5, 5),
+                textcoords="offset points"
+            )
+
+        plt.title("Melhor Caminho Encontrado pela Evolução Diferencial")
+        plt.xlabel("X")
+        plt.ylabel("Y")
+        plt.grid(True)
+
+        plt.savefig(
+            "EvolucaoDiferencialCaminho.png",
+            dpi=300,
+            bbox_inches="tight"
+        )
+
+        plt.show()
         
     except FileNotFoundError:
         diretorio_do_script = os.path.dirname(os.path.abspath(__file__))
